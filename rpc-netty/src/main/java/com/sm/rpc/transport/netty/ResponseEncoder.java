@@ -16,7 +16,7 @@ public class ResponseEncoder extends CommandEncoder {
         if (header instanceof ResponseHeader) {
             ResponseHeader responseHeader = (ResponseHeader) header;
             byteBuf.writeInt(responseHeader.getCode());
-            int errorLength = header.length() - (Integer.BYTES * 5);
+            int errorLength = header.length() - (Integer.BYTES * 4);
             byteBuf.writeInt(errorLength);
             byteBuf.writeBytes(responseHeader.getError() == null ? new byte[0] : responseHeader.getError().getBytes(StandardCharsets.UTF_8));
         }

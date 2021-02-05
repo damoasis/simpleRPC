@@ -3,6 +3,7 @@ package com.sm.rpc.server;
 import com.sm.rpc.client.ServiceTypes;
 import com.sm.rpc.client.stubs.RpcRequest;
 import com.sm.rpc.serialize.SerializeSupport;
+import com.sm.rpc.spi.Singleton;
 import com.sm.rpc.transport.RequestHandler;
 import com.sm.rpc.transport.command.Code;
 import com.sm.rpc.transport.command.Command;
@@ -21,7 +22,7 @@ import java.util.Map;
  * @author: liumeng
  * @create: 2021-02-04 12:38
  */
-
+@Singleton
 public class RpcRequestHandler implements RequestHandler, ServiceProviderRegistry {
     private static final Logger log = LoggerFactory.getLogger(RpcRequestHandler.class);
     private Map<String/*service name*/, Object/*service provider*/> serviceProviders = new HashMap<>();
@@ -42,7 +43,7 @@ public class RpcRequestHandler implements RequestHandler, ServiceProviderRegistr
             if (serviceProvider != null) {
                 // 找到服务提供者，利用Java反射机制调用服务的对应方法
                 String arg = SerializeSupport.parse(rpcRequest.getSerializedArguments());
-                Method method = serviceProviders.getClass().getMethod(rpcRequest.getMethodName(), String.class);
+                Method method = serviceProvider.getClass().getMethod(rpcRequest.getMethodName(), String.class);
                 String result = (String) method.invoke(serviceProvider, arg);
                 // 把结果封装成响应命令并返回
                 return new Command(new ResponseHeader(type(), header.getVersion(), header.getRequestId()), SerializeSupport.serialize(result));
